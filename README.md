@@ -1,6 +1,6 @@
 # Kamerayla Drone Tespiti ve Lazer Başlığıyla Yön Takibi
 
-Bu ders projesinde, gökyüzüne bakan sabit bir kameranın görüntülerinden drone tespit edilmesi ve iki eksenli bir mekanizma üzerindeki lazer başlığının drone'un bulunduğu yöne çevrilmesi amaçlanmaktadır.
+Bu ders projesinde, iki eksenli hareketli bir kameranın görüntülerinden drone tespit edilmesi ve kamerayla aynı başlığa monte edilen lazerin hedefin bulunduğu yöne birlikte çevrilmesi amaçlanmaktadır.
 
 Görüntü işleme ve takip yazılımı Raspberry Pi üzerinde çalışacaktır. Kitin ESP32 kontrol kartı, üreticinin hazır yazılımıyla motor komutlarını uygulayacaktır.
 
@@ -17,16 +17,16 @@ Bu doküman planlanan sistemi açıklar. Tespit mesafesi, gecikme ve yönlendirm
 | **DFRobot DFR0457 anahtarlama modülü** | Raspberry Pi'nin kontrol sinyaliyle lazerin beslemesini açıp kapatmak. |
 | **Fiziksel lazer durdurma butonu** | Gerektiğinde lazerin enerjisini doğrudan kesmek. Bu buton motorların enerjisini kesen bir sistem durdurucusu değildir. |
 | **Güç kaynağı** | İlk kurulumda kitin 12 V adaptörü ve kontrol kartının uygun güç bağlantıları üzerinden sistemi beslemek. Raspberry Pi'ye doğrudan 12 V uygulanmaz. |
-| **Sabit taban ve montaj bağlantıları** | Kamerayı sabit tutmak ve lazer modülünü hareketli başlığa bağlamak. |
+| **Sabit taban ve montaj bağlantıları** | Tabanı sabitlemek; kamera ve lazer modülünü aynı hareketli üst başlıkta taşımak. |
 
-Kitin kamera bağlantısı, kameranın sabit tabana alınmasına uygun şekilde düzenlenecektir. Kamera gökyüzünü izlerken yalnızca lazer başlığı hareket edecektir. Kablolar, bağlantı elemanları ve montaj ölçüleri ayrıntılı kurulum listesinde belirlenecektir.
+Kamera, kitin kendi hareketli üst başlığında kalacaktır. Lazer kameranın yakınına, aynı başlığa monte edilecek; iki parça yatay ve dikey eksenlerde birlikte dönecektir. Raspberry Pi ve kontrol kartı tabanda yer alacaktır. Kablolar için hareket payı bırakılacak ve hareket sınırları doğrulanacaktır. Kitin 360° yatay kapsamı sınırsız ardışık tur olarak kullanılmayacaktır.
 
 ## Donanım ve Yazılım Görev Dağılımı
 
-- **Kamera:** Sabit konumdan sürekli görüntü alır.
-- **Raspberry Pi:** Drone tespiti, görüntü üzerinde konum takibi, kalibrasyona göre açı hesabı ve lazerin açma/kapama kontrolünü gerçekleştirir.
+- **Kamera:** Hareketli başlıktan sürekli görüntü alır; motorlar döndükçe görüş yönü değişir.
+- **Raspberry Pi:** Drone tespiti ve konum takibini yapar. Hedefin görüntüdeki referans noktasına uzaklığına göre motor açılarını düzeltir ve lazerin açma/kapama koşullarını denetler.
 - **ESP32:** Raspberry Pi'den gelen motor komutlarını hazır yazılımıyla uygular.
-- **Servo motorlar:** Lazer başlığını yatay ve dikey eksenlerde hareket ettirir.
+- **Servo motorlar:** Kamera ve lazerin bağlı olduğu başlığı yatay ve dikey eksenlerde birlikte hareket ettirir.
 
 Raspberry Pi ile ESP32 arasındaki komut iletişimi kitin desteklediği USB veya UART arayüzü üzerinden kurulacaktır. Kullanılacak bağlantı ve komut biçimi, üretici dokümanlarına göre entegrasyon sırasında doğrulanacaktır.
 
@@ -34,36 +34,39 @@ Raspberry Pi ile ESP32 arasındaki komut iletişimi kitin desteklediği USB veya
 
 ```mermaid
 flowchart TD
-    A["Sabit kamera gökyüzüne bakar"] --> B["Kameradan yeni görüntü alınır"]
-    B --> C["Raspberry Pi görüntüyü işler"]
-    C --> D{"Drone tespit edildi mi?"}
-
-    D -->|Hayır| E["Lazer kapalı tutulur<br/>Gökyüzü izlenmeye devam edilir"]
+    A["Hareketli kamera başlangıçta gökyüzüne bakar<br/>Lazer kapalıdır"] --> B["Kameradan güncel görüntü alınır"]
+    B --> C["Raspberry Pi drone tespiti yapar"]
+    C --> D{"Güncel ve geçerli tespit var mı?"}
+    D -->|Hayır| E["Lazer kapalı tutulur<br/>Hedef kaybı süresi dolunca hareket durur"]
     E --> B
-
-    D -->|Evet| F["Drone'un görüntüdeki X ve Y konumu belirlenir"]
-    F --> G["Drone'un hareketi takip edilir"]
-    G --> H["Kalibrasyona göre yatay ve dikey motor açıları hesaplanır"]
-    H --> I["Açı komutları ESP32'ye gönderilir"]
-    I --> J["ESP32 hazır yazılımıyla servo motorları yönetir"]
-    J --> K["Lazer başlığı drone'un yönüne döner"]
+    D -->|Evet| F["Hedefin görüntüdeki merkezi bulunur"]
+    F --> G["Referans noktaya göre yatay ve dikey fark hesaplanır"]
+    G --> H["Sınırlı açı düzeltmeleri ESP32'ye gönderilir"]
+    H --> I["Servo motorlar kamera ve lazeri birlikte çevirir"]
+    I --> J{"Kontrollü iç mekân deneyi etkin mi<br/>ve hedef hizalama toleransında mı?"}
+    J -->|Hayır| K["Lazer kapalı tutulur"]
+    J -->|Evet| L["Geçerli tespit koşulları sürerken lazer açılır"]
     K --> B
+    L --> B
 ```
 
 ## Çalışma Akışının Sözel Açıklaması
 
-Gökyüzüne bakan sabit bir kameradan sürekli görüntü alınacaktır. Raspberry Pi bu görüntüleri işleyerek drone'u tespit edecek ve görüntü üzerindeki konumunu takip edecektir.
+Başlangıçta gökyüzüne yöneltilen kameradan sürekli görüntü alınacaktır. Raspberry Pi bu görüntülerde drone'u tespit edip kutusunun merkezini hesaplayacaktır.
 
-Tespit edilen konum, önceden yapılan kalibrasyon kullanılarak yatay ve dikey motor açılarına dönüştürülecektir. Raspberry Pi bu açı komutlarını kitin ESP32 kontrol kartına gönderecektir. ESP32, mevcut hazır yazılımıyla iki servo motoru kontrol ederek lazer başlığını drone'un bulunduğu yöne çevirecektir.
+Hedefin görüntüdeki referans noktadan uzaklığına göre küçük yatay ve dikey açı düzeltmeleri yapılacaktır. İlk motor denemelerinde referans görüntünün merkezi olacak; kamera–lazer hizalamasından sonra gerekirse değiştirilecektir. Raspberry Pi açı komutlarını ESP32'ye gönderecek; ESP32'nin hazır yazılımı iki servo motorla kamera ve lazeri birlikte çevirecektir.
 
-Yeni görüntüler geldikçe drone'un konumu ve başlığın yönü güncellenecektir. Drone tespit edilemediğinde veya takip kaybolduğunda lazer kapalı tutulacaktır. Lazer başlığının hedefe yönelmesi, lazerin otomatik olarak açılması anlamına gelmez.
+Her yeni karede hedefin konumu yeniden ölçülecektir. Kamera da hareket ettiği için sabit bir piksel–motor açısı eşleştirmesi kullanılmayacaktır. Referans çevresinde tolerans, hız/açı sınırları ve güncel kare kontrolü uygulanacaktır. Hedef kaybolduğunda veya görüntü kesildiğinde lazer kapatılacak; belirlenen hedef kaybı süresinde motor hareketi durdurulup son konum korunacaktır.
+
+Lazer başlangıçta ve açık hava denemelerinde kapalı kalacaktır. Yalnızca ışının arka yüzeyde sonlandığı kontrollü iç mekân deneyi elle etkinleştirildiğinde, geçerli ve güncel drone tespiti varken ve hedef hizalama toleransındayken açılabilecektir. Tespit kaybı, eski kare, tolerans dışına çıkma, hata veya durdurma lazeri kapatacaktır. Program sonlanması/kilitlenmesi halinde enerjinin kesilmesi ayrıca doğrulanacak; yalnızca yazılımın normal kapanışına güvenilmeyecektir.
 
 ## İlk Prototipin Kapsamı
 
 - Gündüz, açık gökyüzü arka planında tek bir drone'un tespiti ve takibi hedeflenmektedir.
 - İlk denemeler kısa mesafede başlayacak; başarılı sonuçlara göre yaklaşık 20 metre yüksekliğe ve 10 metre yatay uzaklığa kadar değerlendirilecektir. Bu değerler doğrulanmış performans değildir.
 - Tek kamera ile görüntü üzerindeki konum ve görüş yönü elde edilir. Gerçek mesafe veya üç boyutlu konum doğrudan ölçülmez.
-- Kamera ile lazer başlığı arasındaki konum farkı ve mekanik hatalar kalibrasyonda değerlendirilecektir. Yön takibi, lazerin hedef üzerine isabet ettiğini tek başına göstermez.
+- Kamera ile lazer arasındaki konum ve yön farkı kalibre edilecektir. Görüntüdeki takip referansı merkezin dışında olabilir. Tek mesafede yapılan hizalama farklı mesafelerde tam isabet garantisi vermez.
+- Kamera yalnızca o anda baktığı alanı görür. İlk prototipte hedef kaybında hareket durdurulup son konum korunur; tüm gökyüzünü aynı anda izleme veya otomatik arama kapsamda değildir.
 - Açık hava drone denemelerinde lazer kapalıyken başlığın yön takibi doğrulanacaktır. Lazerle işaretleme, ışının güvenli bir yüzeyde sonlandığı kontrollü bir deney düzeneğinde gösterilecektir.
 
 ## Teknik Kaynaklar
