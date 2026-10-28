@@ -1,0 +1,28 @@
+{
+  "confidence": 0.05,
+  "iou_eslesme": 0.5,
+  "pozitif_goruntu": 11,
+  "negatif_goruntu": 2,
+  "tp": 7,
+  "fp": 0,
+  "fn": 4,
+  "precision": 1.0,
+  "recall": 0.6363636363636364,
+  "small_tp": 0,
+  "small_total": 3,
+  "negatif_yanlis_kutu": 0,
+  "ultralytics_pozitif_test": {
+    "metrics/precision(B)": 0.9945278958380827,
+    "metrics/recall(B)": 0.6363636363636364,
+    "metrics/mAP50(B)": 0.635,
+    "metrics/mAP50-95(B)": 0.4530119047619047,
+    "fitness": 0.4530119047619047
+  },
+  "ultralytics_hiz_ms": {
+    "preprocess": 0.9848727548325603,
+    "inference": 25.769572747363288,
+    "loss": 0.0029363542456518517,
+    "postprocess": 3.362054555592212
+  },
+  "not": "Standart mAP yalnız 11 pozitif test üzerinde. Sabit eşik sayımı ayrıca 2 negatif içerir; kamera testi değildir."
+}

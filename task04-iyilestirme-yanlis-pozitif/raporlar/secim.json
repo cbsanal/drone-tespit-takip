@@ -1,0 +1,30 @@
+{
+  "eski": {
+    "conf": 0.3,
+    "tp": 8,
+    "fp": 1,
+    "fn": 2,
+    "precision": 0.8888888888888888,
+    "recall": 0.8,
+    "f1": 0.8421052631578947,
+    "negatif_goruntu": 13,
+    "negatif_yanlis_kutu": 1,
+    "yanlis_alarmli_negatif": 1,
+    "kucuk_tp": 0,
+    "kucuk_toplam": 0
+  },
+  "yeni": {
+    "conf": 0.5,
+    "tp": 8,
+    "fp": 0,
+    "fn": 2,
+    "precision": 1.0,
+    "recall": 0.8,
+    "f1": 0.8888888888888888,
+    "negatif_goruntu": 13,
+    "negatif_yanlis_kutu": 0,
+    "yanlis_alarmli_negatif": 0,
+    "kucuk_tp": 0,
+    "kucuk_toplam": 0
+  }
+}

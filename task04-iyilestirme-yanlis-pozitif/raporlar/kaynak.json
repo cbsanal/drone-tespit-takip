@@ -1,0 +1,6 @@
+{
+  "url": "https://github.com/ultralytics/assets/releases/download/v0.0.0/coco128.zip",
+  "sha256": "61e5e3028863d8ffc3b81d6a514603954889f0edd5e4b44c4ce60b2da99aeb8e",
+  "erisim_tarihi": "2026-10-26",
+  "not": "COCO train2017 ilk 128 görüntü; hazır temel model bu kaynakla ön eğitim görmüş olabilir. Negatif uygunluğu görsel inceleme gerektirir."
+}

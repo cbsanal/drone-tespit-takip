@@ -1,0 +1,58 @@
+{
+  "eski_sabit_005": {
+    "conf": 0.05,
+    "tp": 7,
+    "fp": 3,
+    "fn": 4,
+    "precision": 0.7,
+    "recall": 0.6363636363636364,
+    "f1": 0.6666666666666666,
+    "negatif_goruntu": 14,
+    "negatif_yanlis_kutu": 3,
+    "yanlis_alarmli_negatif": 3,
+    "kucuk_tp": 0,
+    "kucuk_toplam": 3
+  },
+  "eski_kalibre": {
+    "conf": 0.3,
+    "tp": 7,
+    "fp": 1,
+    "fn": 4,
+    "precision": 0.875,
+    "recall": 0.6363636363636364,
+    "f1": 0.7368421052631579,
+    "negatif_goruntu": 14,
+    "negatif_yanlis_kutu": 1,
+    "yanlis_alarmli_negatif": 1,
+    "kucuk_tp": 0,
+    "kucuk_toplam": 3
+  },
+  "yeni_sabit_005": {
+    "conf": 0.05,
+    "tp": 7,
+    "fp": 1,
+    "fn": 4,
+    "precision": 0.875,
+    "recall": 0.6363636363636364,
+    "f1": 0.7368421052631579,
+    "negatif_goruntu": 14,
+    "negatif_yanlis_kutu": 0,
+    "yanlis_alarmli_negatif": 0,
+    "kucuk_tp": 0,
+    "kucuk_toplam": 3
+  },
+  "yeni_kalibre": {
+    "conf": 0.5,
+    "tp": 7,
+    "fp": 0,
+    "fn": 4,
+    "precision": 1.0,
+    "recall": 0.6363636363636364,
+    "f1": 0.7777777777777778,
+    "negatif_goruntu": 14,
+    "negatif_yanlis_kutu": 0,
+    "yanlis_alarmli_negatif": 0,
+    "kucuk_tp": 0,
+    "kucuk_toplam": 3
+  }
+}

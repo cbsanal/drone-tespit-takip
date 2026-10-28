@@ -1,0 +1,30 @@
+{
+  "not": "Bu beş kare yeni modelin eğitiminde kullanılmıştır; bağımsız başarı kanıtı değildir. Eski eşik 0.05, yeni eşik yalnız doğrulamada seçildi.",
+  "kareler": [
+    {
+      "dosya": "traktor_00.jpg",
+      "eski_kutu": 2,
+      "yeni_kutu": 0
+    },
+    {
+      "dosya": "traktor_01.jpg",
+      "eski_kutu": 2,
+      "yeni_kutu": 0
+    },
+    {
+      "dosya": "traktor_02.jpg",
+      "eski_kutu": 1,
+      "yeni_kutu": 0
+    },
+    {
+      "dosya": "traktor_03.jpg",
+      "eski_kutu": 2,
+      "yeni_kutu": 0
+    },
+    {
+      "dosya": "traktor_04.jpg",
+      "eski_kutu": 1,
+      "yeni_kutu": 0
+    }
+  ]
+}

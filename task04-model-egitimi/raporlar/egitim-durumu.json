@@ -1,0 +1,6 @@
+{
+  "tamamlandi": true,
+  "best": "task04-model-egitimi/runs/egitim/weights/best.pt",
+  "epoch": 55,
+  "secim": "Doğrulama fitness değerine göre best.pt; test kullanılmadı."
+}

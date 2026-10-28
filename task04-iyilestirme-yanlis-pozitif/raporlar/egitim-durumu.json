@@ -1,0 +1,6 @@
+{
+  "tamamlandi": true,
+  "best": "task04-iyilestirme-yanlis-pozitif/runs/egitim/weights/best.pt",
+  "epoch": 31,
+  "secim": "Doğrulama fitness değerine göre best.pt; test kullanılmadı."
+}
