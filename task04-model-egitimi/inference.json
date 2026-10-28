@@ -1,0 +1,16 @@
+{
+  "imgsz": 640,
+  "iou_nms": 0.7,
+  "iou_eslesme": 0.5,
+  "confidence": 0.05,
+  "secim_kurali": "Doğrulama F1; eşitlikte precision, sonra yüksek eşik. Test sonuçları kullanılmadı.",
+  "dogrulama": {
+    "conf": 0.05,
+    "tp": 9,
+    "fp": 0,
+    "fn": 1,
+    "precision": 1.0,
+    "recall": 0.9,
+    "f1": 0.9473684210526315
+  }
+}

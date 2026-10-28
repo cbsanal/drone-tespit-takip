@@ -1,0 +1,6 @@
+{
+  "imgsz": 640,
+  "iou_nms": 0.7,
+  "confidence": 0.5,
+  "secim": "Yalnız pozitif+negatif doğrulama F1; eşitlikte precision, sonra yüksek eşik."
+}

@@ -1,0 +1,19 @@
+{
+  "goruntu": 70,
+  "xml": 70,
+  "kutu": 71,
+  "kucuk_kutu_alan_1024_alti": 3,
+  "alan_orani_yuzde1_alti": 13,
+  "bayt": 24381317,
+  "kararlar": {
+    "kapsam_disi": 133,
+    "secildi": 70,
+    "secim_disi": 701,
+    "teknik_inceleme": 130,
+    "etiket_inceleme": 63
+  },
+  "gorsel_kutu_sorunu": 63,
+  "format_uyusmazligi": 85,
+  "orijinal_hash_kontrolu": "2194 dosya degismedi",
+  "kopya_hash_kontrolu": "Tum secilen dosyalar ve 10 onizleme kaynakla birebir ayni"
+}

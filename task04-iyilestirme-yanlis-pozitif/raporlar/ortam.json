@@ -1,0 +1,12 @@
+{
+  "python": "3.12.14",
+  "torch": "2.10.0+cu126",
+  "torchvision": "0.25.0+cu126",
+  "ultralytics": "8.4.189",
+  "cuda": "12.6",
+  "gpu": "NVIDIA GeForce RTX 2080 Ti",
+  "device_capability": [
+    7,
+    5
+  ]
+}

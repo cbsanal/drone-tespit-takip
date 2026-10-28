@@ -1,0 +1,18 @@
+{
+  "train": {
+    "goruntu": 49,
+    "kutu": 50,
+    "kucuk_kutu": 0
+  },
+  "val": {
+    "goruntu": 10,
+    "kutu": 10,
+    "kucuk_kutu": 0
+  },
+  "test": {
+    "goruntu": 11,
+    "kutu": 11,
+    "kucuk_kutu": 3
+  },
+  "kontrol": "Aynı grup farklı split içinde yok; SHA256 tekrar yok; XML-YOLO koordinat geri dönüş farkı < 0.00001 piksel."
+}
