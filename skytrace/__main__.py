@@ -2,11 +2,18 @@
 
 import argparse
 import csv
+import hashlib
+import importlib.metadata
+import json
 import math
+import platform
 import statistics
 import sys
 import time
 from pathlib import Path
+from types import SimpleNamespace
+
+from .validation import score_frames
 
 COLUMNS = ("frame", "video_ms", "inference_ms", "track_ids")
 
@@ -70,14 +77,15 @@ def camera_capture(args):
 
 
 def evaluate(args):
-    import cv2
-    from ultralytics import YOLO
-
     if not args.video.is_file():
         raise ValueError(f"saved clip not found: {args.video}")
     if not args.weights.is_file():
         raise ValueError(f"local model weights not found: {args.weights}")
     new_file(args.output)
+
+    import cv2
+    from ultralytics import YOLO
+
     model = YOLO(str(args.weights))
     camera = cv2.VideoCapture(str(args.video))
     count = 0
@@ -124,10 +132,13 @@ def read_metrics(path):
         samples = list(reader)
     if not samples:
         raise ValueError("input contains no frame measurements")
-    times = [float(sample["inference_ms"]) for sample in samples]
+    try:
+        times = [float(sample["inference_ms"]) for sample in samples]
+        tracked = sum(bool(sample["track_ids"].strip()) for sample in samples)
+    except (AttributeError, TypeError, ValueError) as error:
+        raise ValueError(f"{path}: malformed frame measurements") from error
     if any(not math.isfinite(value) or value < 0 for value in times):
         raise ValueError("input contains invalid inference times")
-    tracked = sum(bool(sample["track_ids"].strip()) for sample in samples)
     report = {
         "frames": len(samples),
         "frames_with_track": tracked,
@@ -139,9 +150,48 @@ def read_metrics(path):
 
 
 def summarize(args):
-    import json
-
     print(json.dumps(read_metrics(args.input), indent=2))
+
+
+def score(args):
+    print(json.dumps(score_frames(args.input, args.labels), indent=2))
+
+
+def doctor(args):
+    packages = {}
+    for name in ("opencv-python", "ultralytics", "torch"):
+        try:
+            packages[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            packages[name] = None
+    report = {"python": platform.python_version(), "machine": platform.machine(), "packages": packages}
+    if args.weights:
+        with args.weights.open("rb") as stream:
+            actual = hashlib.file_digest(stream, "sha256").hexdigest()
+        report["weights_sha256"] = actual
+        if args.sha256 and actual != args.sha256.lower():
+            raise ValueError(f"weight SHA-256 does not match: {actual}")
+    print(json.dumps(report, indent=2))
+
+
+def benchmark(args):
+    if len(set(args.sizes)) != len(args.sizes):
+        raise ValueError("benchmark sizes must be unique")
+    for path in (args.video, args.weights):
+        if not path.is_file():
+            raise ValueError(f"input file not found: {path}")
+    args.output.mkdir()
+    results = []
+    for size in args.sizes:
+        destination = args.output / f"metrics-{size}.csv"
+        evaluate(SimpleNamespace(
+            video=args.video, weights=args.weights, output=destination,
+            image_size=size, confidence=args.confidence, device=args.device,
+            frames=args.frames,
+        ))
+        results.append(destination)
+    report_html(SimpleNamespace(output=args.output / "report.html", inputs=results))
+
 
 
 def report_html(args):
@@ -200,7 +250,29 @@ def main():
     report.add_argument("inputs", type=Path, nargs="+")
     report.set_defaults(run=report_html)
 
+    scoring = commands.add_parser("score", help="score tracks against frame-level labels")
+    scoring.add_argument("input", type=Path)
+    scoring.add_argument("labels", type=Path)
+    scoring.set_defaults(run=score)
+
+    diagnostics = commands.add_parser("doctor", help="inspect Python, packages and optional weights")
+    diagnostics.add_argument("--weights", type=Path)
+    diagnostics.add_argument("--sha256")
+    diagnostics.set_defaults(run=doctor)
+
+    bench = commands.add_parser("benchmark", help="compare image sizes on the same saved clip")
+    bench.add_argument("video", type=Path)
+    bench.add_argument("weights", type=Path)
+    bench.add_argument("output", type=Path, help="new directory for CSVs and report")
+    bench.add_argument("--sizes", type=positive_int, nargs="+", default=[320, 480, 640])
+    bench.add_argument("--device", default="cpu")
+    bench.add_argument("--confidence", type=confidence, default=0.5)
+    bench.add_argument("--frames", type=positive_int)
+    bench.set_defaults(run=benchmark)
+
     args = parser.parse_args()
+    if args.command == "doctor" and args.sha256 and not args.weights:
+        parser.error("--sha256 requires --weights")
     try:
         args.run(args)
     except (ImportError, OSError, ValueError) as error:

@@ -32,3 +32,5 @@ kaggle.json
 # Local evaluation output
 metrics*.csv
 metrics*.html
+metrics-*/
+.DS_Store

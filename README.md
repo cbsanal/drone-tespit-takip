@@ -124,8 +124,30 @@ python -m skytrace report metrics-demo.html metrics-demo.csv
 | 02–04 — Veri, araştırma ve model | Mevcut betikler ve raporlar taşındı. Ham veri ve ağırlıklar ayrı tutuluyor. |
 | 05 — Pi kamera denemesi | Kayıt ve çevrimdışı değerlendirme komutları hazır. Pi üzerinde doğrulama bekliyor. |
 | 06–08 — Fiziksel hareket ve lazer | Fiziksel kontrol ve lazer entegrasyonu uygulama kapsamına alınmadı. |
-| 09 — Performans | Kayıtlı video üzerinden gecikme ve izli kare oranı raporlanıyor. Saha ölçümü bekliyor. |
-| 10 — Geliştirme ortamı | Python sanal ortamı ve çalıştırma adımları yukarıda. |
+| 09 — Performans | Kayıtlı videoda gecikme, izli kare oranı ve elle etiketlenen karelerde precision, recall ve F1 raporlanıyor. Saha ölçümü bekliyor. |
+| 10 — Geliştirme ortamı | Python sanal ortamı, paket kontrolü ve model özeti doğrulaması mevcut. |
 | 11 — Panel | Çevrimdışı HTML karşılaştırma paneli hazır. |
 | 12 — C++ motor kontrolü | Fiziksel kontrol uygulanmadı. Uygulama komutları Python ile yazıldı. |
-| 13 — Hız | Farklı çözünürlüklerde karşılaştırma destekleniyor. Pi üzerinde ölçüm bekliyor. |
+| 13 — Hız | Farklı çözünürlükler tek komutla karşılaştırılıyor. Pi üzerinde ölçüm bekliyor. |
+
+### Ortam kontrolü ve tekrarlanabilir değerlendirme
+
+```bash
+python -m skytrace doctor --weights /path/to/best.pt
+python -m skytrace benchmark camera.avi /path/to/best.pt metrics-benchmark --sizes 320 480 640
+python -m skytrace score metrics-benchmark/metrics-640.csv labels.csv
+```
+
+`doctor` kurulu paketleri ve modelin SHA-256 özetini gösterir. Bir beklenen
+özet ile doğrulamak için `--sha256` verin. `benchmark` aynı videoyu, modeli
+ve güven eşiğini kullanarak her çözünürlük için yeni bir takip oturumu açar.
+Her ölçümün ilk karede modelin ısınmasını içerebileceğini dikkate alın.
+Üretilen CSV ve HTML dosyaları seçilen yeni dizinde tutulur.
+
+`labels.csv` başlığı `frame,present` şeklindedir. Kare numaraları 1’den
+başlar. Elle etiketlenmiş karelerde drone varsa `1`, yoksa `0` yazın.
+`score` kare düzeyinde precision, recall ve F1 hesaplar. Kutu doğruluğu ve
+iz kimliği doğruluğu için bu skor yeterli değildir. Tanımsız oranlar
+`null` olarak raporlanır.
+
+Yerel otomatik kontroller: `python -m unittest discover -s tests`.
