@@ -28,3 +28,7 @@ __pycache__/
 .env
 .env.*
 kaggle.json
+
+# Local evaluation output
+metrics*.csv
+metrics*.html
