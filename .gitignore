@@ -1,0 +1,51 @@
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Private videos, photos and recordings
+videos/
+recordings/
+captures/
+screenshots/
+private/
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.jpg
+*.jpeg
+*.png
+*.heic
+
+# Datasets and trained models
+datasets/
+runs/
+weights/
+*.pt
+*.pth
+*.onnx
+*.engine
+
+# Tracking data and benchmark outputs
+*.csv
+*.jsonl
+*.log
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
